@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 from typing import Optional, List
 
-from fastapi import APIRouter, Path, Query, Cookie, Header
+from fastapi import APIRouter, Path, Query, Cookie, Header, Request
 from enum import Enum
 from datetime import date
 from pydantic import BaseModel, Field
@@ -130,6 +130,11 @@ def get_cookie(cookie_id: Optional[str] = Cookie(None)):
 
 @app_03.get('/header')
 def header_get(
-		user_agent: Optional[str] = Header(None, convert_underscores=True),
-		x_token: List[str] = Header(None)):
-	return {'User-Agent': user_agent, 'x_token': x_token}
+		request: Request,
+		cookie: Optional[str] = Header(None, convert_underscores=True),
+		x_token: List[str] = Header(None)
+):
+	print(request.headers)
+	for item in request.headers.items():
+		print(item)
+	return {'User-Agent': cookie, 'x_token': x_token, 'request': request.headers}
