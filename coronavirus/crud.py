@@ -31,7 +31,7 @@ def create_city(db: Session, city: schemas.CreateCity):
 	return db_dict
 
 
-def get_city_data_by_choice(db: Session, city_name: str = None, start: int = 0, end: int = 10):
+def get_city_data_by_choice(db: Session, city_name: str = None, start: int = 0, end: int = 1000):
 	if city_name:
 		return db.query(models.Data).filter(models.Data.city.has(province=city_name))
 	return db.query(models.Data).offset(start).limit(end).all()

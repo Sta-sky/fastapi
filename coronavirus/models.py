@@ -5,7 +5,7 @@ from sqlalchemy import Column, String, Integer, BigInteger, Date, DateTime, func
 from sqlalchemy.orm import relationship
 
 # 导入数据库模型
-from .database import Base
+from coronavirus.database import Base
 
 # 构建模型
 
@@ -32,7 +32,7 @@ class City(Base):
 	update_time = Column(DateTime, server_default=func.now(), onupdate=func.now(), comment='更新时间')
 	
 	# 排序
-	__mapper_args__ = {'order_by': country_code} # 默认是正序的  想要倒叙的时候 添加  country_code.desc()
+	__mapper_args__ = {'order_by': country_code.desc()} # 默认是正序的  想要倒叙的时候 添加  country_code.desc()
 	
 	def __repr__(self):
 		return f'{self.country}_{self.province}'

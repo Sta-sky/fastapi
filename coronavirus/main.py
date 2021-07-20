@@ -1,16 +1,20 @@
 """
 	项目入口
 """
-from fastapi import Depends, HTTPException, status, Request, APIRouter
+from fastapi import Depends, HTTPException, status, Request, APIRouter, BackgroundTasks
 from fastapi.templating import Jinja2Templates
 from typing import Optional
+from pydantic import HttpUrl
 from coronavirus.database import database_engine, Base, SessionLocal
 from coronavirus import schemas, crud
 from sqlalchemy.orm import Session
 
+from coronavirus.models import City, Data
+from utils import return_requests_data
+
 
 async def get_user_agent(reqest: Request):
-	print({'user-agent': reqest.headers['User-Agent']})
+	return {'user-agent': reqest.headers['User-Agent']}
 	
 
 app_coronavirus = APIRouter(
@@ -19,7 +23,7 @@ app_coronavirus = APIRouter(
 )
 
 # jinja2模板配置
-# templates = Jinja2Templates(directory='模板相对于run.py的相对位置')
+# templates = Jinja2Templates(directory='模板相对于run.py(主程序入口)的相对位置')
 templates = Jinja2Templates(directory='./coronavirus/templates')
 
 # 创建数据库
@@ -87,11 +91,8 @@ async def start_end_data(start: int = 0, end: int = 10, db: Session=Depends(get_
 
 # 前后端不分离的模板接口
 @app_coronavirus.get('/')
-async def get_template_data(request: Request, city_name: str = None, start: int = 0, end: int = 10, db: Session = Depends(get_db)):
+async def get_template_data(request: Request, city_name: str = None, start: int = 0, end: int = 1000, db: Session = Depends(get_db)):
 	data = crud.get_city_data_by_choice(db=db, city_name=city_name, start=start, end=end)
-	print(data)
-	if not data:
-		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='City Info Not Found')
 	return templates.TemplateResponse(
 		'home.html',
 		{
@@ -101,3 +102,48 @@ async def get_template_data(request: Request, city_name: str = None, start: int 
 		}
 	)
 
+
+def tasks(url: HttpUrl, db: Session):
+	""" 不要再后台任务中导入依赖 db: Session = Depends(get_db) """
+	print('数据开始请求...')
+	city = return_requests_data(param_url=f'{url}?source=jhu&country_code=CN&timelines=false')
+	print('开始同步 城市 数据...')
+	if city.status_code == 200:
+		city_obj = db.query(City)
+		city_obj.delete()
+		for location in city.json()['locations']:
+			province = location['province']
+			population = location['country_population']
+			if not population:
+				population = 0
+			city_info = {
+				'province': province,
+				'country': location['country'],
+				'country_code': location['country_code'],
+				'country_population': population
+			}
+			crud.create_city(db=db, city=schemas.CreateCity(**city_info))
+	
+	print('请求详细数据...')
+	data = return_requests_data(param_url=f'{url}?source=jhu&country_code=CN&timelines=true')
+	print('同步详细数据...')
+	if data.status_code == 200:
+		data_obj = db.query(Data)
+		data_obj.delete()
+		for city_ in data.json()['locations']:
+			db_city = crud.get_city_by_name(db, city_name=city_['province'])
+			for date, confirmed in city_['timelines']['confirmed']['timeline'].items():
+				data_info = {
+					'data_date': date.split('T')[0],
+					'confirmed': confirmed,
+					'deathed': city_["timelines"]["deaths"]["timeline"][date],
+					'recovered': 0
+				}
+				crud.create_city_data(db=db, data=schemas.CreateData(**data_info), city_id=db_city.id)
+	print('所有数据同步完成')
+	
+@app_coronavirus.get('/sync_coronavirus_data/jhu')
+async def get_source_data(back_end: BackgroundTasks, db: Session = Depends(get_db)):
+	back_end.add_task(tasks, 'https://coronavirus-tracker-api.herokuapp.com/v2/locations', db)
+	return {'info': 200, 'message': '数据正在后台同步中.....'}
+	

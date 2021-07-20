@@ -695,3 +695,115 @@ app_coronavirus = APIRouter(
 
 
 
+### 6、中间件、CORS、后台任务、测试用例
+
+##### 1、中间件
+
+~~~python
+"""
+	中间件 对http请求的处理，将请求进入到响应之间的时间加入headers中
+"""
+@app_main.middleware('http')
+async def process_tiem_add_header(request: Request, call_next):
+	# call_next(request) 接收request参数
+	start_time = time.time()
+	response = await call_next(request)
+	process_time = time.time() - start_time
+	response.headers['X-Process-Time'] = str(process_time)
+	return response
+
+~~~
+
+##### 2、CORS
+
+~~~python
+
+""" 自定义 中 间 件 """
+@app_main.middleware('http')
+async def process_tiem_add_header(request: Request, call_next_def):
+	# call_next_def(request) 接收request参数,  为回调函数
+	start_time = time.time()
+	response = await call_next_def(request)
+	process_time = time.time() - start_time
+	response.headers['X-Process-Time'] = str(process_time)
+	return response
+
+""" 加载跨域 配置 中 间 件 """
+
+from fastapi import CORSMiddleware
+
+app_main.add_middleware(
+	CORSMiddleware,
+	# 允许的源，   协议 + ip + 端口 == 源，
+	allow_origins = [
+		'http://127.0.0.1',   # 没有端口默认为80
+		'http://127.0.0.1:8080',
+		'http://127.0.0.1:7000',
+	], # ['*'] 表示所有
+	
+	# 允许使用证书
+	allow_credentials=True,
+	allow_methods=[
+		'get',
+		'post',
+		'put',
+		'delete',
+		'options',
+		'patch'
+	], # ['*'] 表示所有
+	
+	allow_headers=[
+		'accept',
+		'accept-encoding',
+		'authorization',
+		'content-type',
+		'dnt',
+		'origin',
+		'user-agent',
+		'x-csrftoken',
+		'x-requested-with',
+		'token',
+	]
+)
+~~~
+
+
+
+##### 3、后台任务
+
+~~~python
+
+""" 后台任务 """ 
+
+async def task_back(parse):
+	with open('readmes.md', 'w+', encoding='utf-8') as fp:
+		fp.write(parse)
+	
+# 单个函数的异步任务
+@app_08.post('/task')
+async def backend_task(framework: str, backend_task: BackgroundTasks):
+	"""
+		后台任务
+	:param framework: 被调用的后台任务传入的参数
+	:param backend_task:  后台任务对象
+	:return:
+	"""
+	backend_task.add_task(task_back, framework)
+	return {'info': 200}
+
+
+# 依赖注入异步任务
+async def write_readme(bacend_task: BackgroundTasks, parse_q: Optional[str] = None):
+	if parse_q:
+		bacend_task.add_task(task_back, parse_q)
+		return parse_q
+
+@app_08.post('/dependency')
+async def dependency_task(parse: str = Depends(write_readme)):
+	if parse:
+		return {'info': '文件正在写入'}
+	else:
+		return {'info': '啥也不是'}
+
+~~~
+
