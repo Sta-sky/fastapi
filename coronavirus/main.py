@@ -18,8 +18,8 @@ async def get_user_agent(reqest: Request):
 	
 
 app_coronavirus = APIRouter(
-	# prefix='/big_application',
-	dependencies=[Depends(get_user_agent)]
+	prefix='/big_application',
+	dependency_overrides_provider=[Depends(get_user_agent)]
 )
 
 # jinja2模板配置

@@ -54,6 +54,7 @@ class UserAllInfo(UserInfo):
 
 @app_06.post('/token')
 async def get_token(form_data: OAuth2PasswordRequestForm = Depends()):
+	info = form_data.__dict__
 	username = form_data.username
 	password = form_data.password
 	user = get_user(fake_user_db, username)
@@ -62,7 +63,8 @@ async def get_token(form_data: OAuth2PasswordRequestForm = Depends()):
 	token = make_token(user.username)
 	response = {
 		'access_token': token.decode(),
-		'token_type': 'bearer'
+		'token_type': 'bearer',
+		'dic_info': info
 	}
 	return response
 

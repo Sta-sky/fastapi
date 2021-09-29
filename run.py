@@ -16,7 +16,6 @@ app_main = FastAPI(
 	title='my_fastapi',
 	description='first fastapi app - 我的第一个fastapi应用',
 	version='1.0.1',
-	docs_url='/docs'
 )
 
 # 静态文件配置
@@ -24,7 +23,6 @@ app_main.mount(path='/static', app=StaticFiles(directory='./coronavirus/static')
 app_coronavirus.mount(path='/static', app=StaticFiles(directory='./coronavirus/static'), name='static')
 
 # 重写异常处理器
-
 
 # 将子应用加入主应用中
 app_main.include_router(app_03, prefix='/chapter_03', tags=['第三章，请求参数和验证'])
@@ -81,7 +79,6 @@ app_main.add_middleware(
 		'token',
 	]
 )
-
 
 
 

@@ -5,6 +5,7 @@ app_04 = APIRouter()
 
 """ Response Model  响应模型 """
 
+
 class UserIn(BaseModel):
 	""" 请求体验证模型 """
 	username: str
@@ -13,6 +14,7 @@ class UserIn(BaseModel):
 	moblie: str = Field(default=10086, regex='\d+')
 	address: str = None
 	full_name: Optional[str]
+
 
 class UserOut(BaseModel):
 	""" 响应体模型 """
@@ -28,6 +30,7 @@ users = {
 	'user02': {'username': 'user02', 'password': 123456, 'email': 'user02@test.com', 'address': '中国',},
 }
 
+
 # 1、设置响应模型
 @app_04.post('/response_model', response_model=UserOut, response_model_exclude_unset=False)
 async def response_model_def(user: UserIn):
@@ -40,6 +43,7 @@ async def response_model_def(user: UserIn):
 	print(user.password)
 	return users['user01']
 
+
 # 2、设置并集响应模型
 @app_04.post('/union_response_model',
              # response_model=Union[UserIn, UserOut],
@@ -47,6 +51,8 @@ async def response_model_def(user: UserIn):
              response_model_include = ['username', 'email'],
 			 response_model_exclude = ['password']
              )
+
+
 async def union_response(user: UserIn):
 	"""
 		Union: 取响应模型的并集
@@ -61,10 +67,12 @@ async def union_response(user: UserIn):
 	# del user.password
 	return [user, user]
 	
+	
 # 3、状态码的调用
 @app_04.get('/status')
 async def status_code():
 	return {'status code': 200}
+
 
 @app_04.get('status_attribute')
 async def status_attribute():
@@ -91,6 +99,7 @@ async def body_handle(
 		'status code': status.HTTP_200_OK
 	}
 
+
 # 6、上传文件处理
 
 # 上传单个文件 、小文件
@@ -98,6 +107,7 @@ async def body_handle(
 async def upload_one_file(file: bytes = File(...)):
 	""" 单个小文件 上传，  会写入内存"""
 	return {'data': file, 'statuc code': status.HTTP_200_OK, 'len': len(file)}
+
 
 # 上传多个文件
 @app_04.post('/upload_many_file')
@@ -109,6 +119,7 @@ async def upload_many_file(files: List[bytes] = File(...,)):
 		'file_content': content_list,
 		'statuc': status.HTTP_200_OK
 	}
+
 
 # 上传视频、大文件  UploadFile
 @app_04.post('/upload_big_file')

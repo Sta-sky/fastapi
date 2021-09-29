@@ -14,10 +14,9 @@ class User(BaseModel):
 	sinup_ts: Optional[datetime] = None
 	firends: List[int] = []
 
-
 parse_dic = {
 	"id": "123",
-	"sinup_ts": "2021-06-23 10:12",
+	"sinup_ts": str(datetime.now()),
 	"firends": [1, 2]
 }
 user = User(**parse_dic)
@@ -28,7 +27,6 @@ print(repr(user.sinup_ts))
 print(type(repr(user.sinup_ts)))
 # 字典方式输出
 print(user.dict())
-
 
 
 print('2 错误捕获','++' * 100)
@@ -57,7 +55,7 @@ print(User.parse_file(path))
 print(user.__fields__.keys())
 
 
-print('3 递归模型','++' * 100)
+print('4 递归模型','++' * 100)
 
 class Sound(BaseModel):
 	wang: str
@@ -73,7 +71,7 @@ dog = Dog(color='white', age=1, whight=12.4, sound=[{'wang': 'aaa'}, {'wang': 'b
 print(dog.dict())
 
 
-print('3 从类的实例，创建符合ORM模型对象的模型','++' * 100)
+print('5 从类的实例，创建符合ORM模型对象的模型','++' * 100)
 
 # 创建模型类
 Base = declarative_base()

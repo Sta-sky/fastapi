@@ -30,3 +30,6 @@ SessionLocal = sessionmaker(
 
 # 创建基本的映射类
 Base = declarative_base(bind=database_engine, name='Base')
+
+
+
