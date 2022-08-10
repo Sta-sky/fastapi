@@ -1,1 +1,1 @@
-from main import app_coronavirus
+from coronavirus.main import app_coronavirus
