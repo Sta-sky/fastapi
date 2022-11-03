@@ -62,7 +62,7 @@ async def get_token(form_data: OAuth2PasswordRequestForm = Depends()):
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='username == or password is wrong')
 	token = make_token(user.username)
 	response = {
-		'access_token': token.decode(),
+		'access_token': token,
 		'token_type': 'bearer',
 		'dic_info': info
 	}

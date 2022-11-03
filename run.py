@@ -38,11 +38,14 @@ app_main.include_router(app_coronavirus, prefix='/coronavirus', tags=['新冠病
 
 @app_main.middleware('http')
 async def process_tiem_add_header(request: Request, call_next_def):
+    # 在此可加请求日志系统
     # call_next_def(request) 接收request参数,  为回调函数
+    print(request.__dict__)
     start_time = time.time()
     response = await call_next_def(request)
     process_time = time.time() - start_time
     response.headers['X-Process-Time'] = str(process_time)
+    print(response.__dict__, '----------')
     return response
 
 
