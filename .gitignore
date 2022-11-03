@@ -6,6 +6,14 @@ bin-release/
 
 # Other files and folders
 .settings/
+./__pycache__/
+./Components/__pycache__/
+./coronavirus/__pycache__/
+./fastapi_tutorial/__pycache__/
+./pydandic_unti/__pycache__/
+./venv
+./.git
+./.idea
 
 # Executables
 *.swf

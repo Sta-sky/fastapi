@@ -31,8 +31,10 @@ async def class_dependency(comment=Depends(DependencyClass)):
 	response = {}
 	if comment.q:
 		response.update({'q': comment.q})
-	items = fake_data_sql[comment.page: comment.page + comment.limit]
-	response.update({'name item': items})
+	print(comment.q, comment.page, comment.limit)
+	print({comment.page: comment.page + comment.limit})
+	fake_data_sql.append({comment.page: comment.page + comment.limit})
+	response.update({'name item': fake_data_sql})
 	return response
 
 # 子依赖
