@@ -100,7 +100,7 @@ async def get_template_data(request: Request, city_name: str = None, start: int 
         {
             'request': request,
             'data': data,
-            'sycn_data_url': '/coronavirus/sync_coronavirus_data/jhu'
+            'sycn_data_url': '/coronavirus/big_application/sync_coronavirus_data/jhu'
         }
     )
 
@@ -109,6 +109,7 @@ def tasks(url: HttpUrl, db: Session):
     """ 不要再后台任务中导入依赖 db: Session = Depends(get_db) """
     print('数据开始请求...')
     city = return_requests_data(param_url=f'{url}?source=jhu&country_code=CN&timelines=false')
+    print(city)
     print('开始同步 城市 数据...')
     if city.status_code == 200:
         city_obj = db.query(City)
@@ -147,5 +148,7 @@ def tasks(url: HttpUrl, db: Session):
 
 @app_coronavirus.get('/sync_coronavirus_data/jhu')
 async def get_source_data(back_end: BackgroundTasks, db: Session = Depends(get_db)):
+    print("开始")
     back_end.add_task(tasks, 'https://coronavirus-tracker-api.herokuapp.com/v2/locations', db)
+    print("结束")
     return {'info': 200, 'message': '数据正在后台同步中.....'}

@@ -32,7 +32,7 @@ users = {
 
 
 # 1、设置响应模型
-@app_04.post('/response_model', response_model=UserOut, response_model_exclude_unset=False)
+@app_04.post('/response_model', response_model=UserOut, response_model_exclude_unset=True)
 async def response_model_def(user: UserIn):
 	"""
 		response_model_exclude_unset: 设置有默认值，或可选参数  用户未传进来时 不返回
@@ -40,7 +40,7 @@ async def response_model_def(user: UserIn):
 	:param user: 请求体验证模型
 	:return:
 	"""
-	print(user.password)
+	print('---', user.password)
 	return users['user01']
 
 
@@ -49,7 +49,7 @@ async def response_model_def(user: UserIn):
              # response_model=Union[UserIn, UserOut],
              response_model = List[UserOut],
              response_model_include = ['username', 'email'],
-			 response_model_exclude = ['password']
+			 response_model_exclude = ['username']
              )
 
 
@@ -113,7 +113,9 @@ async def upload_one_file(file: bytes = File(...)):
 @app_04.post('/upload_many_file')
 async def upload_many_file(files: List[bytes] = File(...,)):
 	title_list = [item.title() for item in files]
-	content_list = [item for item in files]
+	print(title_list)
+	content_list = [info for info in files]
+	print(content_list)
 	return {
 		'file_title': title_list,
 		'file_content': content_list,

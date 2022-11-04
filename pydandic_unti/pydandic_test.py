@@ -12,7 +12,7 @@ class User(BaseModel):
 	id: int
 	name: str = 'Jone Sonw'
 	sinup_ts: Optional[datetime] = None
-	firends: List[int] = []
+	firends: List[int]
 
 parse_dic = {
 	"id": "123",
@@ -31,9 +31,10 @@ print(user.dict())
 
 print('2 错误捕获','++' * 100)
 try:
-	User(id=12, sinup_ts=None, friends=[12, '324', '4f'], name='name' )
+	users = User(id="12", sinup_ts="23", firends=[12, "2"], name=12 )
+	print('==', users.json())
 except ValidationError as e:
-	print(e.json())
+	print('error', e.json())
 
 print('3 模型类的属性跟方法','++' * 100)
 print(user.dict())
@@ -42,8 +43,10 @@ print(user.json())
 print(type(user.json()))
 
 # 解析字典
+print('解析字典')
 print(User.parse_obj(obj=parse_dic))
 # 解析字符串
+print('解析字符串')
 print(User.parse_raw(
 	'{"id": "123", "name": "jone dan", "sinup_ts": "2021-06-23 10:12", "firends": ["12", "23"]}'
 ))
@@ -93,10 +96,19 @@ class ComPanysModel(BaseModel):
 		orm_mode = True
 		
 orm_c = ComPanysORM(
-	id = 21,
+	id = "1",
 	publick_key = 'frewbgsf&(&)_)',
-	name = '黄',
+	name = '黄不够发达发达',
 	domains = ['baidu.com', 'aliyun.com']
 )
 
-print(ComPanysModel.from_orm(orm_c))
+print("模型")
+try:
+	print(ComPanysModel.from_orm(orm_c))
+except Exception as e:
+	print(str(e))
+	
+
+
+
+

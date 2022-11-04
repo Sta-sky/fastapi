@@ -11,7 +11,7 @@
         $(document).ready(function(){
             $('#left_btn').click(function(){
                 const input_val = $('#city').val();
-                window.location.href = 'http://' + window.location.host + '/coronavirus?city_name=' + input_val;
+                window.location.href = 'http://' + window.location.host + '/coronavirus/big_application?city_name=' + input_val;
             });
             $('#right_btn').click(function(){
                 $.get('{{ sycn_data_url }}', function(result){

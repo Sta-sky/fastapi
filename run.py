@@ -1,5 +1,5 @@
 """
-	项目入口
+    项目入口
 """
 import time
 
@@ -14,7 +14,7 @@ from fastapi_tutorial import app_03, app_04, app_05, app_06, app_07, app_08
 
 app_main = FastAPI(
     title='my_fastapi',
-    description='first fastapi app - 我的第一个fastapi应用',
+    description='first fastapi app - fastapi TEST',
     version='1.0.1',
 )
 
