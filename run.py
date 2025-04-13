@@ -90,6 +90,5 @@ if __name__ == '__main__':
         host='127.0.0.1',
         port=7001,
         reload=True,
-        debug=True,
         workers=4  # 进程数量
     )

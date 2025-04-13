@@ -14,8 +14,7 @@ DATABASE_URL = 'mysql+pymysql://root:123456@127.0.0.1:3306/coronavirus'
 
 database_engine = create_engine(
 	DATABASE_URL, # 数据库连接地址
-	encoding = 'utf-8',
-	# echo = True  # 表示引擎将用repr()函数 记录操作日志
+	echo = True  # 表示引擎将用repr()函数 记录操作日志
 )
 
 # 在sqlalchemy中  数据库操作crud 是通过session会话进行的， 每一个session就是一个数据库连接
@@ -29,7 +28,9 @@ SessionLocal = sessionmaker(
 
 
 # 创建基本的映射类
-Base = declarative_base(bind=database_engine, name='Base')
+Base = declarative_base()
 
+# 绑定引擎到元数据
+Base.metadata.bind = database_engine
 
 
